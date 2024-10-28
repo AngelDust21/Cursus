@@ -1,5 +1,6 @@
 import csv
 from tabulate import tabulate
+
 ################################################################
 
 def lees_facturen_csv(bestand):
@@ -9,9 +10,7 @@ def lees_facturen_csv(bestand):
             reader = csv.DictReader(file)
             for row in reader:
                 afacturen.append(row)
-    except FileNotFoundError:
-        print(f"Het bestand '{bestand}' is niet gevonden. Zorg ervoor dat het bestand bestaat.")
-    return afacturen
+   
 
 ################################################################
 
@@ -45,6 +44,7 @@ def voeg_facturen_toe(bfacturen):
         }
         bfacturen.append(nieuw_factuur)
         print(f"Factuur {naam} is toegevoegd.")
+        schrijf_facturen_naar_csv('facturen.csv', bfacturen)  # Directe update van de CSV
     except ValueError:
         print("Foutieve invoer. Zorg ervoor dat de ingevoerde gegevens juist zijn.")
 
@@ -56,6 +56,7 @@ def verwijder_ondernemer(cfacturen):
         if onder.lower() in info_fac["Ondernemer"].lower():
             cfacturen.remove(info_fac)
             print(f"Ondernemer {info_fac['Ondernemer']} is verwijderd.")
+            schrijf_facturen_naar_csv('facturen.csv', cfacturen)  # Directe update van de CSV
             return
     print(f"Ondernemer {onder} niet gevonden.")
 
@@ -69,6 +70,7 @@ def sorteer_op_fac_nummer(facturen):
         )
         print("\nFacturen gesorteerd op Factuurnummer (aflopend):")
         print(tabulate(facturen, headers="keys", tablefmt="fancy_grid"))
+        schrijf_facturen_naar_csv('facturen.csv', facturen)  # Directe update van de CSV
     except ValueError as e:
         print(f"Er is een probleem bij het sorteren van factuurnummers: {e}")
 
@@ -85,28 +87,25 @@ def bereken_bedrag_gemiddelde(facturen):
 
 ################################################################
 
+# Voer de functies in de juiste volgorde uit
 
-# facturen uit het CSV-bestand
+# Stap 1: Lees de facturen uit het CSV-bestand
 facturen = lees_facturen_csv('facturen.csv')
 
-# ingelezen facturen
+# Stap 2: Toon de ingelezen facturen en het gemiddelde bedrag
 print("\nOorspronkelijke facturen:")
 toon_ondernemers(facturen)
 bereken_bedrag_gemiddelde(facturen)
 
-# nieuwe factuur toe
+# Stap 3: Voeg een nieuwe factuur toe
 voeg_facturen_toe(facturen)
-schrijf_facturen_naar_csv('facturen.csv', facturen)
 print("\nFacturen na toevoegen van een nieuwe factuur:")
 toon_ondernemers(facturen)
 
-# Verwijder een ondernemer
+# Stap 4: Verwijder een ondernemer
 verwijder_ondernemer(facturen)
-schrijf_facturen_naar_csv('facturen.csv', facturen)
 print("\nFacturen na verwijderen van een ondernemer:")
 toon_ondernemers(facturen)
 
-# Factuurnummer en toon de gesorteerde lijst
+# Stap 5: Sorteer de facturen op Factuurnummer en toon de gesorteerde lijst
 sorteer_op_fac_nummer(facturen)
-schrijf_facturen_naar_csv('facturen.csv', facturen)
-
